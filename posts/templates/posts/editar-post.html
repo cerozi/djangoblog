@@ -1,0 +1,173 @@
+{% extends 'base_templates/layout.html' %}
+{% load humanize %}
+
+{% block notifications %}
+
+<a href="#"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{{ count_notifications }}</span></button></a>
+<a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
+<a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
+
+{% endblock %}
+
+
+{% block content %}
+
+    <div id="main" class="container-fluid d-flex">
+        <!-- Barra Izquierda -->
+        <div class="sidebar m-5 d-none d-md-block">
+            <div class="">
+                <div class="card " style="width: 18rem; text-align:center;border-radius: 20px;">
+                    <img class="card-img-top rounded-circle"
+                        style="width:60%; position: relative;left: 62px;padding-top: 20px;"
+                        src="{{ request.user.perfil.foto.url }}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title font-weight-bold">{{ request.user.first_name }}</h5>
+                        <h6 class="card-title font-weight-bold">@{{ request.user.username }}</h6>
+                        
+
+                        <p class="card-text">{{ request.user.perfil.bio }}</p>
+                        <h6 class="card-title font-weight-bold">
+                        {{ followers }} Followers   
+                        {{ following }} Following
+                        </h6>
+                        <a href="{% url 'perfil' request.user.username %}" class="btn  text-white rounded-pill">Meu perfil</a>
+                    </div>
+
+                </div>
+                <!-- LINK EDITAR PERFIL-->
+                <a href="{% url 'editar-perfil' %}" id="addATweetLeft" onclick="addTweet()" type="button"
+                style="border-radius: 30px; font-size: 1.1rem; font-weight:bold;"
+                class="btn btn-lg btn-block mt-4 text-white ">Editar meu perfil</a>
+            </div>
+        </div>
+        <!-- End Barra Izquierda -->
+
+        <!-- Center -->
+        <div class="content">
+
+            <div id="inputTweetArea" class="tweet-wrap">
+                <div class="d-flex">
+                    <div class="col-xs">
+                        <!-- Image form -->
+                        <img src="{{ request.user.perfil.foto.url }}" alt="" class="avator">
+                        <!-- Formulario -->
+                    </div>
+
+                    <!-- Formulario -->
+                    <form class="col pr-0" method="post">
+                        {% csrf_token %}
+                        {{ post.as_p }}
+                        <div class="container d-flex" style="padding: 1rem 0 0 0;">
+                            <div id="leftBtn">
+                                <div id="charBadge" class="badge badge-pill badge-primary ml-2"
+                                    style="display: flex;align-items: center;width: 50%;justify-content: center;">
+                                    <div id="charCountArea">140</div>
+                                </div>
+                            </div>
+
+                            <div id="rightBtn">
+                                <button class="btn rounded-pill"
+                                    style="width: 100%;">Editar</button>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- Formulario -->
+
+                </div>
+                <div class="d-flex justify-content-center mt-2">
+                </div>
+            </div>
+
+            <!-- Tweets -->
+            {% for comment in post_comments %}
+            <div id="tweetCards">
+                <!-- FOR LOOP HERE -->
+                <div class="tweet-wrap" style="border-radius:20px">
+                    <div class="tweet-header">
+                        <img src="{{ comment.usuario.perfil.foto.url }}"
+                            alt="" class="avator">
+                        <div class="tweet-header-info">
+                             <!-- LINK PARA O PERFIL DO USÚARIO -->
+                            <a href="{% url 'perfil' comment.usuario.username %}">
+                            {{ comment.usuario.first_name }}
+                            </a>
+                            <span>@{{ comment.usuario.username }}</span><span>{{ comment.data|naturaltime }}
+                            </span>
+                            <p>{{ comment.texto }}</p>
+                        </div>
+                    </div>
+                    <div class="tweet-info-counts">
+
+                        <div class="retweets">
+                            <button style="background: white; border: none;"> 
+                            <svg class="feather feather-repeat sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="17 1 21 5 17 9"></polyline>
+                                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                <polyline points="7 23 3 19 7 15"></polyline>
+                                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                            </svg>
+                        </button>
+                            <div class="retweet-count"> </div>
+                        </div>
+
+                        <div class="likes">
+                            <form action="{% url 'like-comment' %}" method="POST">
+                                {% csrf_token %}
+                                <button type ='submit' style="background: white; border: none;"> 
+                                <svg class="feather feather-heart sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path
+                                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <input type="hidden" name="comment_pk" value="{{ comment.pk }}">
+                             </form>
+                            <div class="likes-count">{{ comment.likes.quantidade }}</div>
+                        </div>
+
+                        <!-- DELETE -->
+                        {% if request.user == comment.usuario %}
+                        <div class="trash">
+                             <!-- DELETAR POST -->
+                             <form action="{% url 'delete-comment' %}" method="POST">
+                                 {% csrf_token %}
+                                <button type="submit" style="background: white; border: none;">
+                                <a href="" style="background: white; border: none;">
+                                    <i class="fa fa-trash-o" style="color:#657786; font-size: 20px" aria-hidden="true"></i>
+                                </a>
+                                </button>
+                                <input type="hidden" name="comment_pk" value="{{ comment.pk }}">
+                            </form>
+                        </div>
+                        {% endif %}
+                        <!-- END-DELETE -->
+                    </div>
+                </div>
+                <!-- FOR LOOP HERE -->
+            </div>
+            {% empty %}
+            {% endfor %}
+            <!-- EndTweets -->
+        </div>
+        <!-- End Center -->
+
+
+        <!-- Barra Derecha -->
+        <div class="sidebar m-5 d-none d-xl-block">
+            <div class="card" style="width: 18rem;">
+                <div class="card-header">
+                    Sugestões de perfil
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for perfil in perfil_list %}
+                    <li class="list-group-item"><a href="{% url 'perfil' perfil.usuario.username %}" style="text-decoration: none;color: #657787;">{{ perfil.usuario.username }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,88 @@
+{% extends 'base_templates/layout.html' %}
+{% load humanize %}
+
+{% block notifications %}
+
+<a href="#"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{{ count_notifications }}</span></button></a>
+<a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
+<a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="content">
+    {% for notification in user_notifications %}
+            <div id="tweetCards">
+                <!-- FOR LOOP HERE -->
+                <div class="tweet-wrap" style="border-radius:20px">
+                    {% if notification.notification_type == 0 %}
+                        {% if notification.post %}
+                        <a href="{% url 'post-detail' notification.post.pk %}">
+                            <div class="tweet-header">
+                            <img src="{{ notification.from_user.perfil.foto.url }}"
+                                alt="" class="avator">
+                                <div class="tweet-header-info">
+                                    <span>{{notification.data|naturaltime}}</span>
+                                    <br>
+                                    <br>
+                                    {{ notification.from_user.first_name }}
+                                    <span>@{{ notification.from_user.username }}</span>
+                                    <i> curtiu seu post.</i>
+                                </div>
+                            </div>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'post-detail' notification.comment.post.pk %}">
+                            <div class="tweet-header">
+                            <img src="{{ notification.from_user.perfil.foto.url }}"
+                                alt="" class="avator">
+                                <div class="tweet-header-info">
+                                    <span>{{notification.data|naturaltime}}</span>
+                                    <br>
+                                    <br>
+                                    {{ notification.from_user.first_name }}
+                                    <span>@{{ notification.from_user.username }}</span>
+                                    <i> curtiu seu comment.</i>
+                                </div>
+                            </div>
+                        </a>
+                        {% endif %}
+                    {% elif notification.notification_type == 1 %}
+                    <a href="{% url 'post-detail' notification.post.pk %}">
+                        <div class="tweet-header">
+                        <img src="{{ notification.from_user.perfil.foto.url }}"
+                            alt="" class="avator">
+                            <div class="tweet-header-info">
+                                <span>{{notification.data|naturaltime}}</span>
+                                <br>
+                                <br>
+                                {{ notification.from_user.first_name }}
+                                <span>@{{ notification.from_user.username }}</span>
+                                <i> comentou no seu post.</i>
+                            </div>
+                        </div>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'perfil' notification.from_user.username %}">
+                        <div class="tweet-header">
+                        <img src="{{ notification.from_user.perfil.foto.url }}"
+                            alt="" class="avator">
+                            <div class="tweet-header-info">
+                                <span>{{notification.data|naturaltime}}</span>
+                                <br>
+                                <br>
+                                {{ notification.from_user.first_name }}
+                                <span>@{{ notification.from_user.username }}</span>
+                                <i> começou a seguir você.</i>
+                            </div>
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>    
+    {% empty %}
+    {% endfor %}
+</div>
+
+{% endblock %}

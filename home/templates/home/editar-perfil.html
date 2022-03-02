@@ -1,0 +1,52 @@
+{% extends 'base_templates/layout.html' %}
+
+{% block notifications %}
+
+<a href="#"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{{ user_notifications }}</span></button></a>
+<a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
+<a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
+
+{% endblock %}
+
+{% block content %}
+
+    <div id="main" class="container-fluid d-flex">
+        <div class="">
+            <div id="inputTweetArea" class="tweet-wrap2">
+                <div class="d-flex">
+                    <div class="col-xs">
+                        <!-- Image form -->
+                        <img src="{{ request.user.perfil.foto.url }}" alt="" class="avator">
+                        <!-- Formulario -->
+                    </div>
+
+                    <!-- Formulario -->
+                    <form class="col pr-0" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="input-wrapper">
+                            <label>Nombre</label>
+                            {{ u_form.first_name }}
+                        </div>
+                        <div class="input-wrapper">
+                            <label for="user-name-id">Username</label>
+                            {{ u_form.username }}
+                        </div>
+                        <div class="input-wrapper">
+                            <label>Bio</label>
+                            {{ p_form.bio }}
+                        </div>
+                        <div class="input-wrapper">
+                            {{ p_form.foto }}
+                        </div>
+
+                        <button class="twitter-btn">Actualizar</button>
+                    </form>
+                    <!-- Formulario -->
+                    
+                </div>
+            </div>
+        </div>
+        <!-- End Center -->
+    </div>
+
+{% endblock content %}

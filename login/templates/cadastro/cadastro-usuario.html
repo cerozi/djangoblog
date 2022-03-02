@@ -1,0 +1,44 @@
+{% extends 'base_templates/layout.html' %}
+
+{% block content %}
+<body class="login-page">
+    <div class="twitter-login-box">
+        <header>
+            <img src="https://static01.nyt.com/images/2014/08/10/magazine/10wmt/10wmt-jumbo-v4.jpg?quality=90&auto=webp" alt="twitter logo">
+            <h1>Registrar no DjangoBlog</h1>
+        </header>
+
+        <form action='' method="post">
+            {% csrf_token %}
+            <div class="input-wrapper">
+                <label for="user-name-id">Nome</label>
+                {{ form.first_name }}
+            </div>
+            <div class="input-wrapper">
+                <label for="user-name-id">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="input-wrapper">
+                <label for="user-name-id">Email</label>
+                {{ form.email }}
+            </div>
+
+            <div class="input-wrapper">
+                <label for="password-id">Senha</label>
+                {{ form.password1 }}
+            </div>
+            <div class="input-wrapper">
+                <label for="password-id">Confirmar senha</label>
+                {{ form.password2 }}
+            </div>
+
+            <button type="submit" class="twitter-btn">Registrar</button>
+        </form>
+
+        <div class="footer">
+            <a href="{% url 'login' %}">Já tem conta?</a>
+        </div>
+
+    </div>
+
+{% endblock content %}

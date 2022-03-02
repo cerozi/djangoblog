@@ -1,0 +1,174 @@
+{% extends 'base_templates/layout.html' %}
+{% load humanize %}
+
+{% block notifications %}
+
+<a href="#"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{{ user_notifications }}</span></button></a>
+<a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
+<a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
+
+{% endblock %}
+
+{% block content %}
+    <div id="main" class="container-fluid d-flex">
+        <!-- Barra Izquierda -->
+        <div class="sidebar m-5 d-none d-md-block">
+            <div class="">
+                <div class="card " style="width: 18rem; text-align:center;border-radius: 20px;">
+                    <img class="card-img-top rounded-circle"
+                        style="width:60%; position: relative;left: 62px;padding-top: 20px;"
+                        src="{{ user.perfil.foto.url }}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title font-weight-bold">{{ user.first_name }}</h5>
+                        <h6 class="card-title font-weight-bold">@{{ user.username }}</h6>
+                        
+
+                        <p class="card-text">{{ user.perfil.bio }}</p>
+                        <h6 class="card-title font-weight-bold">
+                        {{ num_seguidores }} Followers   
+                        {{ num_seguindo }} Following
+                        </h6>
+                        {% if request.user.is_authenticated %}
+                            {% if user.username != request.user.username %}
+                                {% if user not in request.user.perfil.following.all %}
+                                <form action="" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn  text-white rounded-pill">
+                                        Follow
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form action="" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn  text-white rounded-pill">
+                                        Unfollow
+                                    </button>
+                                </form>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                        
+                    </div>
+
+                </div>
+                {% if request.user.is_authenticated %}
+                    {% if user.username == request.user.username %}
+                        <a href="{% url 'editar-perfil' %}" id="addATweetLeft" onclick="addTweet()" type="button"
+                        style="border-radius: 30px; font-size: 1.1rem; font-weight:bold;"
+                        class="btn btn-lg btn-block mt-4 text-white ">Editar meu perfil</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <!-- End Barra Izquierda -->
+
+        <!-- Center -->
+        <div class="content">
+
+
+            <!-- Tweets -->
+            {% for post in posts %}
+            <div id="tweetCards">
+                <!-- FOR LOOP HERE -->
+                <div class="tweet-wrap" style="border-radius:20px">
+                    <div class="tweet-header">
+                        <img src="{{ post.usuario.perfil.foto.url }}"
+                            alt="" class="avator">
+                        <div class="tweet-header-info">
+                            <a href='{% url "perfil" post.usuario.username %}'>{{ post.usuario.first_name }}</a> <span>@{{ post.usuario.username }}</span><span>{{ post.data|naturaltime }}
+                            </span>
+                            <p>{{ post.texto }}</p>
+                        </div>
+                    </div>
+                    <div class="tweet-info-counts">
+
+                        <div class="comments">
+                            <a href="{{ post.get_absolute_url }}">
+                            <button style="background: white; border: none;"> 
+                            <svg class="feather feather-message-circle sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path
+                                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                                </path>
+                            </svg>
+                            </button>
+                            </a>
+                            <div class="comment-count">{{ post.num_comments }}</div>
+                        </div>
+
+                        <div class="retweets">
+                            <button style="background: white; border: none;"> 
+                            <svg class="feather feather-repeat sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="17 1 21 5 17 9"></polyline>
+                                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                                <polyline points="7 23 3 19 7 15"></polyline>
+                                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                            </svg>
+                        </button>
+                            <div class="retweet-count"> </div>
+                        </div>
+
+                        <div class="likes">
+                            <form action="{% url 'like-post' %}" method="POST">
+                                {% csrf_token %}
+                                <button type ='submit' style="background: white; border: none;"> 
+                                <svg class="feather feather-heart sc-dnqmqq jxshSx" xmlns="http://www.w3.org/2000/svg"
+                                    width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path
+                                        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                    </path>
+                                </svg>
+                            </button>
+                            <input type="hidden" name="post_id" value="{{ post.pk }}">
+                             </form>
+                            <div class="likes-count">{{ post.likes.quantidade }}</div>
+                        </div>
+
+                        <!-- DELETE -->
+                        {% if request.user == user %}
+                        <div class="trash">
+                            <!-- DELETAR POST -->
+                            <form action="{% url 'excluir-post' post.pk %}" method="POST">
+                                {% csrf_token %}
+                               <button type="submit" style="background: white; border: none;">
+                               <a href="" style="background: white; border: none;">
+                                <i class="fa fa-trash-o" style="color:#657786; font-size: 20px" aria-hidden="true"></i>
+                               </a>
+                               </button>
+                           </form>
+                        </div>
+                        {% endif %}
+                        <!-- END-DELETE -->
+                    </div>
+                </div>
+                <!-- FOR LOOP HERE -->
+
+            </div>
+            {% endfor %}
+            <!-- EndTweets -->
+
+
+        </div>
+        <!-- End Center -->
+
+
+        <!-- Barra Derecha -->
+        <div class="sidebar m-5 d-none d-xl-block">
+            <div class="card" style="width: 18rem;">
+                <div class="card-header">
+                    Sugestões de perfil
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for perfil in perfil_list %}
+                    <li class="list-group-item"><a href="{% url 'perfil' perfil.usuario.username %}" style="text-decoration: none;color: #657787;">{{ perfil.usuario.username }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

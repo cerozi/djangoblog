@@ -1,0 +1,50 @@
+{% extends 'base_templates/layout.html' %}
+{% load static %}
+
+{% block notifications %}
+
+<a href="#"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{{ user_notifications }}</span></button></a>
+<a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
+<a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="content">
+
+    <div id="inputTweetArea" class="tweet-wrap">
+        <div class="d-flex">
+            <form action='?' method="GET">
+                {% csrf_token %}
+                <input type="text" autocomplete="off" name="username" placeholder="Procure pelo username..." value="{{ request.GET.username }}" class="p-1 border">
+                <button type="submit" class="btn rounded-pill">Procurar</button>
+            </form>
+        </div>
+        <div class="d-flex justify-content-center mt-2">
+        </div>
+    </div>
+
+    {% for user in object_list %}
+            <div id="tweetCards">
+                <!-- FOR LOOP HERE -->
+                <div class="tweet-wrap" style="border-radius:20px">
+                    <div class="tweet-header">
+                        <img src="{{ user.perfil.foto.url }}"
+                            alt="" class="avator">
+                        <div class="tweet-header-info">
+                             <!-- LINK PARA O PERFIL DO USÚARIO -->
+                            <a href="{% url 'perfil' user.username %}">
+                            {{ user.first_name }}
+                            </a>
+                            <span>@{{ user.username }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+    {% empty %}
+    {% endfor %}
+
+</div>
+
+{% endblock %}
