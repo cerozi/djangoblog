@@ -11,6 +11,14 @@ class UsuarioCreate(CreateView):
     form_class = UserRegistrationForm
     success_url = reverse_lazy('login')
 
+    def form_valid(self, form):
+
+        url = super().form_valid(form)
+
+        Perfil.objects.create(usuario=self.object, nome=self.object.first_name)
+
+        return url
+
 
 class UsuarioUpdate(LoginRequiredMixin, UpdateView):
     login_url = 'login'

@@ -27,6 +27,13 @@ With your virtual enviroment on, install all packages and modules found in requi
 pip install requirements.txt
 ```
 
+Make the database migrations:
+
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
 Now, run the server and the project can be found on your localhost(http://127.0.0.1:8000/):
 ```python
 python manage.py runserver
