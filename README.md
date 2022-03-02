@@ -18,16 +18,16 @@ This blog contains the following features:
 # To run you need to..
 
 Clone this repo:
-''' bash
+```python
 git clone https://github.com/cerozi/djangoblog.git
-'''
+```
 
 With your virtual enviroment on, install all packages and modules found in requirements.txt:
-''' bash
+```python
 pip install requirements.txt
-'''
+```
 
 Now, run the server and the project can be found on your localhost(http://127.0.0.1:8000/):
-''' bash
+```python
 python manage.py runserver
-'''
+```
