@@ -1,5 +1,3 @@
-from audioop import reverse
-from tkinter import N
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Post, Likes, Comments, Notifications
 from django.urls import reverse_lazy
