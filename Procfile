@@ -1,1 +1,1 @@
-web: gunicorn CMA.wsgi
+web: gunicorn blog.wsgi
