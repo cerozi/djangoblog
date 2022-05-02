@@ -2,7 +2,7 @@
 
 A simple blog made using Django 3.2.10 and Python 3.7.6. For this blog, i took Twitter as a big reference (you can see by the bird logo), and tried to made my own version of it. I will be greateful for any suggestion or appointment, so if you have one, please leave it to me. :)
 
-The actual deployed project can be found at: https://django-twitter-blog.herokuapp.com/
+The actual deployed project can be found at: https://django-twitter-blog.herokuapp.com/ (username: admin // password: admin... or you can register your own profile ;D)
 
 # Features
 
