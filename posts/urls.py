@@ -3,31 +3,31 @@ from .views import PostDelete, PostLike, PostDetail, CommentLike, CommentDelete,
 
 urlpatterns = [
 
-    # EXCLUIR POSTS 
+    # deleting posts
 
     path('excluir/post/<int:pk>', PostDelete, name='excluir-post'),
 
-    # EDITAR POSTS
+    # updating posts
 
     path('editar/post/<int:pk>', PostUpdate, name='editar-post'),
 
-    # SUBMISSÃO DE LIKE NO POST
+    # liking a post
 
     path('like-post/', PostLike, name='like-post'),
 
-    # DETAIL DO POST
+    # post detail
 
     path('post/<int:pk>', PostDetail, name='post-detail'),
 
-    # LIKE NO COMMENT
+    # liking comments
 
     path('like-comment/', CommentLike, name='like-comment'),
 
-    # DELETAR COMMENT
+    # deletes comment
 
     path('delete-comment/', CommentDelete, name='delete-comment'),
 
-    # UPDATE COMMENT
+    # updates comment
 
     path('update-comment/', CommentUpdate, name='update-comment'),
 

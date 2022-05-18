@@ -5,7 +5,7 @@ from .forms import UserRegistrationForm
 from .models import Perfil
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-# Create your views here.
+# CREATE USER
 class UsuarioCreate(CreateView):
     template_name = 'cadastro/cadastro-usuario.html'
     form_class = UserRegistrationForm
@@ -19,7 +19,7 @@ class UsuarioCreate(CreateView):
 
         return url
 
-
+# UPDATE USER
 class UsuarioUpdate(LoginRequiredMixin, UpdateView):
     login_url = 'login'
     model = Perfil

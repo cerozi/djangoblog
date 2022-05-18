@@ -5,6 +5,8 @@ from login.models import Perfil
 from .forms import PostForm, CommentForm
 
 
+# UPDATES POST
+
 def PostUpdate(request, pk):
     post_obj = Post.objects.get(pk=pk, usuario=request.user)
 
@@ -13,7 +15,7 @@ def PostUpdate(request, pk):
 
     post = PostForm(instance=post_obj)
 
-    # EDITA A POSTAGEM
+    # UPDATES POST
 
     if request.method == 'POST':
         post = PostForm(request.POST, instance=post_obj)
@@ -21,7 +23,7 @@ def PostUpdate(request, pk):
             post.save()
             return redirect(reverse_lazy('home'))
 
-    # COMENTÁRIOS DO POST
+    # POST'S COMMENTS
 
     post_comments = list(post_obj.comments_set.all())
 
@@ -46,6 +48,7 @@ def PostUpdate(request, pk):
 
     return render(request, 'posts/editar-post.html', context=context)
 
+# POST DELETE
 
 def PostDelete(request, pk):
     if request.method == 'POST':
@@ -54,10 +57,11 @@ def PostDelete(request, pk):
 
     return redirect(reverse_lazy('home'))
 
+# GETS POST DETAIL
 
 def PostDetail(request, pk):
 
-    # SUBMISSÃO DE COMENTÁRIO
+    # COMMENTING ON THE CURRENT POST
 
     post = Post.objects.get(pk=pk)
     comment_form = CommentForm()
@@ -75,7 +79,7 @@ def PostDetail(request, pk):
 
             return redirect(post.get_absolute_url())
 
-    # LISTA DE COMMENTS
+    # COMMENT'S LIST
 
     post_comments = list(post.comments_set.all())
 
@@ -85,7 +89,7 @@ def PostDetail(request, pk):
 
     perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
 
-    # SEGUIDORES E SEGUINDO
+    # FOLLOWERS AND FOLLOWING
 
     my_profile = Perfil.objects.get(usuario=request.user)
     following = len(my_profile.following.all())
@@ -108,7 +112,7 @@ def PostDetail(request, pk):
     return render(request, 'posts/post-detail.html', context=context)
 
 
-# SUBMISSÃO DE LIKE NO POST
+# LIKING THE POST
 
 def PostLike(request):
 
@@ -130,9 +134,9 @@ def PostLike(request):
 
     return redirect(reverse_lazy('home'))
 
-# ==================== COMENTÁRIOS ===============
+# ==================== COMMENTS ===============
 
-# SUBMISSÃO DE LIKE NO COMENTÁRIO
+# LIKING A COMMENT
 
 def CommentLike(request):
     if request.method == 'POST':
@@ -157,7 +161,7 @@ def CommentLike(request):
     else:
         return redirect(reverse_lazy('home'))
 
-# EXCLUSÃO DE COMENTÁRIOS
+# DELETING COMMENTS
 
 def CommentDelete(request):
     if request.method == 'POST':
@@ -178,11 +182,11 @@ def CommentDelete(request):
     else:
         return redirect(reverse_lazy('home'))
 
-# UPDATE DE COMENTÁRIO
+# UPDATING COMMENT
 
 def CommentUpdate(request):
 
-    # SUBMISSÃO DA EDIÇÃO DO COMMENT
+    # EDITING COMENNT
 
     comment_pk = request.GET.get('comment_pk')
     comment_obj = Comments.objects.get(pk=comment_pk, usuario=request.user)
@@ -198,12 +202,12 @@ def CommentUpdate(request):
 
     comment_form = CommentForm(instance=comment_obj)
 
-    # LISTA DE COMENTÁRIOS DO POST
+    # COMMENT'S LIST ON THE CURRENT POST
 
     post_comments = list(comment_obj.post.comments_set.all())
     post_comments.sort(key=lambda x: x.data, reverse=True)
 
-    # DETAIL DO POST
+    # POST DETAIL
 
     post_obj = comment_obj.post
 
@@ -220,7 +224,7 @@ def CommentUpdate(request):
 
     count_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
 
-    # CONTEXTO
+    # CONTEXT
 
     context = {
         'post_obj': post_obj,

@@ -6,19 +6,19 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', home, name='home'),
 
-    # ACESSAR PERFIL
+    # USER PROFILE
 
     path('perfil/<str:username>/', renderizaPerfil, name='perfil'),
 
-    # EDIÇÃO DE PERFIL
+    # UPDATES PROFILE
 
     path('editar/', editarPerfil, name='editar-perfil'),
 
-    # FILTRO DE PESQUISA DE USÚARIOS
+    # FILTER FOR USER SEARCH
 
     path('search-user/', userList.as_view(), name='search-user'),
 
-    # NOTIFICAÇÕES
+    # NOTIFICATIONS
 
     path('notificacoes/', showNotifications, name='notificacoes')
 

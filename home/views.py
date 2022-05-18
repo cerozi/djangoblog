@@ -7,7 +7,7 @@ from posts.forms import PostForm
 from home.forms import UserUpdate, PerfilUpdate
 from django.views.generic.list import ListView
 
-# VIEW DO NEWSFEED/HOME
+# NEWSFEED/HOME
 
 def home(request):
 
@@ -16,7 +16,7 @@ def home(request):
 
     else:
 
-        # CRIAÇÃO DE POST
+        # POST CREATION
 
         form = PostForm()
         if request.method == 'POST':
@@ -27,12 +27,12 @@ def home(request):
                 Likes.objects.create(post=new_post)
                 return redirect(reverse_lazy('home'))
 
-        # BUSCA OS SEGUIDORES E SEGUINDO
+        # FOLLOWERS AND FOLOWING
 
         following = len(request.user.perfil.following.all())
         followers = len(request.user.following.all())
 
-        # LISTA DE POSTS
+        # POSTS LIST
 
         posts_list = []
 
@@ -50,11 +50,11 @@ def home(request):
 
         posts_list.sort(key=lambda x: x.data, reverse=True)
 
-        # PERFIS - WHO TO FOLLOW
+        # WHO TO FOLLOW PROFILES
 
         perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
 
-        # NOTIFICAÇÕES
+        # NOTIFICATIONS
 
         user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
 
@@ -74,7 +74,7 @@ def home(request):
 
 
 
-# RENDERIZA O PERFIL VISITADO
+# RENDERS OTHER USER PROFILE
 
 def renderizaPerfil(request, username):
 
@@ -83,10 +83,14 @@ def renderizaPerfil(request, username):
         my_profile = Perfil.objects.get(usuario=request.user)
         posts_list = []
 
+        # USER POSTS
+
         for post in posts:
             posts_list.append(post)
 
         posts_list.sort(key=lambda x: x.data, reverse=True)
+
+        # FOLLOW OR UNFOLLOW USER
 
         if request.method == 'POST':
             if user_visitado in my_profile.following.all():
@@ -100,7 +104,7 @@ def renderizaPerfil(request, username):
 
             redirect(user_visitado.perfil.get_absolute_url())
 
-        # SEGUINDO E SEGUIDORES
+        # FOLLOWERS AND FOLOWING
 
         perfil_visitado = Perfil.objects.get(usuario=user_visitado)
         seguindo = perfil_visitado.following.all()
@@ -110,11 +114,11 @@ def renderizaPerfil(request, username):
 
         # =======================================================
 
-        # PERFIS - WHO TO FOLLOW
+        # WHO TO FOLLOW
 
         perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
 
-        # NOTIFICAÇÕES
+        # NOTIFICATIONS
 
         user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
 
@@ -130,7 +134,7 @@ def renderizaPerfil(request, username):
         return render(request, 'home/perfil.html', context=context)
 
 
-# EDITAR PERFIL DO USÚARIO
+# UPDATES USER PROFILE
 
 def editarPerfil(request):
 
@@ -146,7 +150,7 @@ def editarPerfil(request):
     u_form = UserUpdate(instance=request.user)
     p_form = PerfilUpdate(instance=request.user.perfil)
 
-    # NOTIFICAÇÕES
+    # NOTIFICATIONS
 
     user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
 
@@ -157,7 +161,7 @@ def editarPerfil(request):
     }
     return render(request, 'home/editar-perfil.html', context=context)
 
-# FILTRO DE PESQUISA POR USÚARIO
+# FILTER FOR USER 
 
 class userList(ListView):
     model = User
@@ -181,7 +185,7 @@ class userList(ListView):
 
         return context
 
-# VIEW DE NOTIFICAÇÕES DO USER
+# USER NOTIFICATIONS
 
 def showNotifications(request):
 
