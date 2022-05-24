@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Perfil(models.Model):
@@ -29,4 +29,3 @@ class Perfil(models.Model):
 
     def get_absolute_url(self):
         return reverse('perfil', kwargs={'username': self.nome})
-

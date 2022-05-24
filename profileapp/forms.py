@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django.contrib.auth.models import User
-from login.models import Perfil
+from profileapp.models import Perfil
 
 class UserUpdate(ModelForm):
     class Meta:
