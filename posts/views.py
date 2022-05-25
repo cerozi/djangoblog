@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 from profileapp.models import Perfil
 from .forms import PostForm
 from comments.forms import CommentForm
+from django.contrib.auth.decorators import login_required
 
 
 # UPDATES POST
@@ -63,6 +64,7 @@ def PostDelete(request, pk):
 
 # GETS POST DETAIL
 
+@login_required(login_url='login')
 def PostDetail(request, pk):
 
     # COMMENTING ON THE CURRENT POST

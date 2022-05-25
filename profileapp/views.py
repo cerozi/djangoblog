@@ -6,9 +6,11 @@ from .forms import UserUpdate, PerfilUpdate
 from django.shortcuts import redirect
 from notifications.models import Notifications
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
 
 # RENDERS OTHER USER PROFILE
 
+@login_required(login_url='login')
 def renderizaPerfil(request, username):
 
         user_visitado = User.objects.get(username=username)
@@ -69,6 +71,7 @@ def renderizaPerfil(request, username):
 
 # UPDATES USER PROFILE
 
+@login_required(login_url='login')
 def editarPerfil(request):
 
     if request.method == 'POST':

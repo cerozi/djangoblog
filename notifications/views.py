@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from .models import Notifications
+from django.contrib.auth.decorators import login_required
 
 # USER NOTIFICATIONS
 
+@login_required(login_url='login')
 def showNotifications(request):
 
     user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).order_by('-data')

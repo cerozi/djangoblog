@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 # Create your models here.
 class Perfil(models.Model):
@@ -29,3 +30,29 @@ class Perfil(models.Model):
 
     def get_absolute_url(self):
         return reverse('perfil', kwargs={'username': self.nome})
+
+    def return_newsfeed_posts(self):
+        from posts.models import Post
+        posts_list = []
+
+        queryset = self.following.all()
+        my_posts = Post.objects.filter(usuario=self.usuario)
+
+        for user in queryset:
+            user_posts = Post.objects.filter(usuario=user)
+            for post in user_posts:
+                posts_list.append(post)
+
+        for post in my_posts:
+            posts_list.append(post)
+
+        posts_list.sort(key=lambda x: x.data, reverse=True)
+        return posts_list
+
+# django signals; when a user is created, a profile automatically...
+# ... is created associated to that user;
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        Perfil.objects.create(nome=instance.username, usuario=instance)
+
+post_save.connect(create_profile, sender=User)

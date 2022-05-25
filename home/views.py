@@ -7,73 +7,56 @@ from profileapp.models import Perfil
 from django.contrib.auth.models import User
 from posts.forms import PostForm
 from django.views.generic.list import ListView
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 # NEWSFEED/HOME
 
+@login_required(login_url='login')
 def home(request):
+    # POST CREATION
 
-    if not request.user.is_authenticated:
-        return redirect('/login/')
+    form = PostForm()
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            txt = form.data['texto']
+            new_post = Post.objects.create(usuario=request.user, texto = txt)
+            Likes.objects.create(post=new_post)
+            return redirect(reverse_lazy('home'))
 
-    else:
+    # FOLLOWERS AND FOLOWING
 
-        # POST CREATION
+    following = len(request.user.perfil.following.all())
+    followers = len(request.user.following.all())
 
-        form = PostForm()
-        if request.method == 'POST':
-            form = PostForm(request.POST)
-            if form.is_valid():
-                txt = form.data['texto']
-                new_post = Post.objects.create(usuario=request.user, texto = txt)
-                Likes.objects.create(post=new_post)
-                return redirect(reverse_lazy('home'))
+    # POSTS LIST
+    from profileapp.models import Perfil
+    posts_list = Perfil.return_newsfeed_posts(request.user.perfil)
+    # WHO TO FOLLOW PROFILES
 
-        # FOLLOWERS AND FOLOWING
+    perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
 
-        following = len(request.user.perfil.following.all())
-        followers = len(request.user.following.all())
+    # NOTIFICATIONS
 
-        # POSTS LIST
+    user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
 
-        posts_list = []
+    context = {
+        'seguidores': followers,
+        'seguindo': following,
+        'form': form,
+        'posts_list': posts_list,
+        'perfil_list': perfil_list,
+        'user_notifications': user_notifications,
+    }
 
-        my_profile_following = request.user.perfil.following.all()
-
-        for user in my_profile_following:
-            user_posts = Post.objects.filter(usuario=user)
-            for post in user_posts:
-                posts_list.append(post)
-
-        my_posts = Post.objects.filter(usuario=request.user)
-
-        for post in my_posts:
-            posts_list.append(post)
-
-        posts_list.sort(key=lambda x: x.data, reverse=True)
-
-        # WHO TO FOLLOW PROFILES
-
-        perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
-
-        # NOTIFICATIONS
-
-        user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
-
-        context = {
-            'seguidores': followers,
-            'seguindo': following,
-            'form': form,
-            'posts_list': posts_list,
-            'perfil_list': perfil_list,
-            'user_notifications': user_notifications,
-        }
-
-        return render(request, 'home/newsfeed.html', context=context)
+    return render(request, 'home/newsfeed.html', context=context)
 
 
 
 # FILTER FOR USER 
 
+@method_decorator(login_required(login_url='login'), name='get')
 class userList(ListView):
     model = User
     template_name = 'home/search-user.html'
