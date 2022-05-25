@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CommentDelete, CommentUpdate
+from .views import CommentDelete, CommentUpdate, CommentCreate
 
 urlpatterns = [
     # deletes comment
@@ -9,5 +9,9 @@ urlpatterns = [
     # updates comment
 
     path('update-comment/', CommentUpdate, name='update-comment'),
+
+    # updates comment
+
+    path('create-comment/<int:pk>/', CommentCreate, name='comment-create'),
 
 ]

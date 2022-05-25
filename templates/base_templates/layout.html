@@ -1,4 +1,6 @@
 {% load static %}
+{% load user_notifications_tag %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,8 +34,11 @@
 
                 </ul>
                 <!-- Nav Bar -->
-                {% block notifications %}
-                {% endblock %}
+                {% if request.user.is_authenticated %}
+                <a href="{% url 'notificacoes' %}"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{% return_notifications_count request.user %}</span></button></a>
+                <a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
+                <a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
+                {% endif %}
                 <!-- Nav Bar -->
             </div>
         </nav>

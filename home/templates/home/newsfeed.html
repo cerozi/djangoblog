@@ -1,14 +1,6 @@
 {% extends 'base_templates/layout.html' %}
 {% load humanize %}
 
-{% block notifications %}
-
-<a href="{% url 'notificacoes' %}"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{{ user_notifications }}</span></button></a>
-<a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
-<a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
-
-{% endblock %}
-
 {% block content %}
 
     <div id="main" class="container-fluid d-flex">

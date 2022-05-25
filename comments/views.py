@@ -1,45 +1,45 @@
-from django.shortcuts import render
+# django built-in app imports;
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy, reverse
+
+# other app imports;
 from notifications.models import Notifications
-from .models import Comments
-from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse_lazy
 from profileapp.models import Perfil
+from posts.models import Post
+
+# current app imports;
 from .forms import CommentForm
+from .models import Comments
 
-# Create your views here.
-# DELETING COMMENTS
 
+# delete comment;
 def CommentDelete(request):
-    if request.method == 'POST':
-        comment_pk = request.POST.get('comment_pk')
-        comment_obj = get_object_or_404(Comments, usuario=request.user, pk=comment_pk)
-
-        notification = Notifications.objects.get(notification_type=1, from_user=request.user, to_user=comment_obj.post.usuario, post=comment_obj.post, pk=comment_obj.pk)
-        notification.delete()
-
-        comment_obj.delete()
-
-        post = comment_obj.post
-        post.num_comments -= 1
-        post.save()
-
-
-        return redirect(post.get_absolute_url())
-    else:
+    if request.method != 'POST':
         return redirect(reverse_lazy('home'))
 
-# UPDATING COMMENT
+    # gets the comment primary key from the html;
+    comment_pk = request.POST.get('comment_pk')
+    comment_obj = get_object_or_404(Comments, usuario=request.user, pk=comment_pk)
+    comment_obj.delete()
 
+    # updates the amount of comments associated to that current post;
+    post = comment_obj.post
+    post.num_comments -= 1
+    post.save()
+
+    return redirect(post.get_absolute_url())
+
+# updates comment;
 def CommentUpdate(request):
 
-    # EDITING COMENNT
-
+    # gets the comment primary key from the html;
     comment_pk = request.GET.get('comment_pk')
-    comment_obj = Comments.objects.get(pk=comment_pk, usuario=request.user)
-
-    if comment_obj == None:
+    comment_qs = Comments.objects.filter(pk=comment_pk, usuario=request.user)
+    if not (comment_qs.exists()): # checks if the comment exists;
         return redirect(reverse_lazy('home'))
 
+    # updates comment;
+    comment_obj = comment_qs[0]
     if request.method == 'POST':
         comment_form = CommentForm(request.POST, instance=comment_obj)
         if comment_form.is_valid():
@@ -48,40 +48,41 @@ def CommentUpdate(request):
 
     comment_form = CommentForm(instance=comment_obj)
 
-    # COMMENT'S LIST ON THE CURRENT POST
+    # returns a list with all the comments associated to that post;
+    from posts.models import Post
+    post_comments = Post.return_post_comments(comment_obj.post)
 
-    post_comments = list(comment_obj.post.comments_set.all())
-    post_comments.sort(key=lambda x: x.data, reverse=True)
-
-    # POST DETAIL
-
-    post_obj = comment_obj.post
-
-    # WHO TO FOLLOW
-
+    # who to follow queryset;
     perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
 
-    # FOLLOWERS E FOLLOWING
-
+    # followers and following amount;
     following = len(request.user.perfil.following.all())
     followers = len(request.user.following.all())
 
-    # NOTIFICATIONS
-
-    count_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
-
-    # CONTEXT
-
+    # context
     context = {
-        'post_obj': post_obj,
+        'post_obj': comment_obj.post,
         'post_comments': post_comments,
         'comment_form': comment_form,
         'perfil_list': perfil_list,
         'followers': followers,
         'following': following,
         'comment_obj': comment_obj,
-        'count_notifications': count_notifications,
 
     }
 
     return render(request, 'comments/editar-comment.html', context=context)
+
+# creates a comment;
+def CommentCreate(request, pk):
+    if request.method != 'POST':
+        return redirect(reverse('home'))
+
+    form = CommentForm(request.POST)
+    post = Post.objects.get(pk=pk)
+    if form.is_valid():
+        form.instance.usuario = request.user # associates the comment to that logged user;
+        form.instance.post = post # associates the comment to the post;
+        form.save()
+
+    return redirect(post.get_absolute_url())

@@ -1,14 +1,6 @@
 {% extends 'base_templates/layout.html' %}
 {% load humanize %}
 
-{% block notifications %}
-
-<a href="#"><button type="button" class="btn btn-primary">Notificações <span class="badge badge-light">{{ count_notifications }}</span></button></a>
-<a href="{% url 'home' %}" class="btn text-white my-2 my-sm-0" type="submit">Inicio</a>
-<a href="{% url 'logout' %}" class="btn text-white my-2 my-sm-0" type="submit">Logout</a>
-
-{% endblock %}
-
 
 {% block content %}
 
@@ -138,7 +130,7 @@
                     </div>
 
                     <!-- Formulario -->
-                    <form class="col pr-0" action="" method="post">
+                    <form class="col pr-0" action="{% url 'comment-create' post.pk %}" method="post">
                         {% csrf_token %}
                         {{ comment_form.as_p }}
                         <div class="container d-flex" style="padding: 1rem 0 0 0;">

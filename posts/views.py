@@ -72,19 +72,6 @@ def PostDetail(request, pk):
     post = Post.objects.get(pk=pk)
     comment_form = CommentForm()
 
-    if request.method == 'POST':
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            txt = comment_form.data['texto']
-            comment = Comments.objects.create(texto=txt, usuario=request.user, post=post)
-            post.num_comments += 1
-            post.save()
-
-            Likes.objects.create(comment=comment)
-            Notifications.objects.create(notification_type=1, from_user=request.user, to_user=post.usuario, post=post, pk=comment.pk)
-
-            return redirect(post.get_absolute_url())
-
     # COMMENT'S LIST
 
     post_comments = list(post.comments_set.all())

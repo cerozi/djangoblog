@@ -19,3 +19,8 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post-detail', args=[self.pk, ])
+
+    def return_post_comments(self):
+        comments = list(self.comments_set.all())
+        comments.sort(key=lambda x: x.data, reverse=True)
+        return comments
