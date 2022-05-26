@@ -1,43 +1,25 @@
-from django.shortcuts import render
-from posts.models import Post
-from .models import Perfil
-from django.contrib.auth.models import User
-from .forms import UserUpdate, PerfilUpdate
-from django.shortcuts import redirect
-from notifications.models import Notifications
-from django.urls import reverse_lazy
+# django built-in apps imports;
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.shortcuts import redirect, render
+from django.urls import reverse, reverse_lazy
+# other apps imports;
+from notifications.models import Notifications
+from notifications.signals import follow_signal
+from posts.models import Post
+# current app imports;
+from .forms import PerfilUpdate, UserUpdate
+from .models import Perfil
 
-# RENDERS OTHER USER PROFILE
 
+# render profile;
 @login_required(login_url='login')
 def renderizaPerfil(request, username):
 
+        # return a list with all the posts from the user;
+        from posts.models import Post
         user_visitado = User.objects.get(username=username)
-        posts = Post.objects.filter(usuario=user_visitado)
-        my_profile = Perfil.objects.get(usuario=request.user)
-        posts_list = []
-
-        # USER POSTS
-
-        for post in posts:
-            posts_list.append(post)
-
-        posts_list.sort(key=lambda x: x.data, reverse=True)
-
-        # FOLLOW OR UNFOLLOW USER
-
-        if request.method == 'POST':
-            if user_visitado in my_profile.following.all():
-                my_profile.following.remove(user_visitado)
-                notification = Notifications.objects.get(notification_type=2, from_user=request.user, to_user=user_visitado)
-                if notification:
-                    notification.delete()
-            else:
-                my_profile.following.add(user_visitado)
-                Notifications.objects.create(notification_type=2, from_user=request.user, to_user=user_visitado)
-
-            redirect(user_visitado.perfil.get_absolute_url())
+        posts_list = Post.return_user_posts(None, user=user_visitado)
 
         # FOLLOWERS AND FOLOWING
 
@@ -53,46 +35,54 @@ def renderizaPerfil(request, username):
 
         perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
 
-        # NOTIFICATIONS
-
-        user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
-
         context = {
             'user': user_visitado,
             'posts': posts_list,
             'num_seguindo': count_seguindo,
             'num_seguidores': count_seguidores,
             'perfil_list': perfil_list,
-            'user_notifications': user_notifications,
         }
 
         return render(request, 'profileapp/perfil.html', context=context)
 
 
-# UPDATES USER PROFILE
-
+# updates profile;
 @login_required(login_url='login')
 def editarPerfil(request):
-
+    # updates profile and user info;
     if request.method == 'POST':
         u_form = UserUpdate(request.POST, instance=request.user)
         p_form = PerfilUpdate(request.POST, request.FILES, instance=request.user.perfil)
-        
         if u_form.is_valid() and p_form.is_valid():
             u_form.save()
             p_form.save()
             return redirect(reverse_lazy('home'))
-
+    # user and profile instance;
     u_form = UserUpdate(instance=request.user)
     p_form = PerfilUpdate(instance=request.user.perfil)
-
-    # NOTIFICATIONS
-
-    user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
 
     context = {
         'u_form': u_form,
         'p_form': p_form,
-        'user_notifications': user_notifications,
     }
     return render(request, 'profileapp/editar-perfil.html', context=context)
+
+
+# follow/unfollows user;
+def followuser(request, username):
+    if request.method != 'POST':
+        return redirect(reverse('home'))
+
+    user = User.objects.get(username=username)
+    logged_user = Perfil.objects.get(usuario=request.user)
+
+    if user in logged_user.following.all(): # checks if the request user profile is associated to the user; 
+        logged_user.following.remove(user) # if so, unfollows;
+        notification = Notifications.objects.filter(notification_type=2, from_user=request.user, to_user=user)
+        if notification.exists():
+            notification[0].delete()
+    else:
+        logged_user.following.add(user) # if dont, follows;
+        follow_signal.send(None, from_user=logged_user.usuario, to_user=user) # creates a notification;
+
+    return redirect(reverse('perfil', args=[user.username]))

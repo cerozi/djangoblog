@@ -1,18 +1,11 @@
 from django.urls import path
-from .views import PostDelete, PostDetail, PostUpdate
+from .views import PostDelete, PostDetail, PostUpdate, PostCreate
 
 urlpatterns = [
 
-    # deleting posts
-
     path('excluir/post/<int:pk>', PostDelete, name='excluir-post'),
-
-    # updating posts
-
     path('editar/post/<int:pk>', PostUpdate, name='editar-post'),
-
-    # post detail
-
+    path('criar/post/', PostCreate, name='criar-post'),
     path('post/<int:pk>', PostDetail, name='post-detail')
 
 ]

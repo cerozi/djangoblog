@@ -23,14 +23,14 @@
                         {% if request.user.is_authenticated %}
                             {% if user.username != request.user.username %}
                                 {% if user not in request.user.perfil.following.all %}
-                                <form action="" method="POST">
+                                <form method="POST" action="{% url 'follow-user' user.username %}" >
                                     {% csrf_token %}
                                     <button type="submit" class="btn  text-white rounded-pill">
                                         Follow
                                     </button>
                                 </form>
                                 {% else %}
-                                <form action="" method="POST">
+                                <form method="POST" action="{% url 'follow-user' user.username %}">
                                     {% csrf_token %}
                                     <button type="submit" class="btn  text-white rounded-pill">
                                         Unfollow

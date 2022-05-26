@@ -1,60 +1,58 @@
-from django.shortcuts import get_object_or_404, redirect, render
-from .models import Post
-from likes.models import Likes
-from comments.models import Comments
-from notifications.models import Notifications
-from django.urls import reverse_lazy
-from profileapp.models import Perfil
-from .forms import PostForm
-from comments.forms import CommentForm
+# django built-in app imports;
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+from django.urls import reverse, reverse_lazy
+# other apps imports;
+from profileapp.models import Perfil
+from comments.forms import CommentForm
+# current app imports;
+from .forms import PostForm
+from .models import Post
 
 
-# UPDATES POST
+# creates a post;
+def PostCreate(request):
+    if request.method != 'POST':
+        return redirect(reverse('home'))
 
+    form = PostForm(request.POST)
+    if form.is_valid():
+        form.instance.usuario = request.user
+        form.save()
+        return redirect(reverse('home'))
+
+# updating a post;
 def PostUpdate(request, pk):
-    post_obj = Post.objects.get(pk=pk, usuario=request.user)
-
-    if post_obj == None:
+    # checks if the post exists;
+    post_qs = Post.objects.filter(pk=pk, usuario=request.user)
+    if not post_qs.exists():
         return redirect(reverse_lazy('home'))
+    post_obj = post_qs[0]
 
+    # updates the post
     post = PostForm(instance=post_obj)
-
-    # UPDATES POST
-
     if request.method == 'POST':
         post = PostForm(request.POST, instance=post_obj)
         if post.is_valid():
             post.save()
             return redirect(reverse_lazy('home'))
 
-    # POST'S COMMENTS
+    # returns all the comments from that post
+    from .models import Post
+    post_comments = Post.return_post_comments(post_obj)
 
-    post_comments = list(post_obj.comments_set.all())
-
-    post_comments.sort(key=lambda x: x.data)
-
-    # WHO TO FOLLOW
-
+    # profile queryset
     perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
-
-    # NOTIFICATIONS
-
-    count_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
-
-    # CONTEXT
 
     context = {
         'post': post,
         'perfil_list': perfil_list,
         'post_comments': post_comments,
-        'count_notifications': count_notifications,
     }
 
     return render(request, 'posts/editar-post.html', context=context)
 
-# POST DELETE
-
+# deletes a post;
 def PostDelete(request, pk):
     if request.method == 'POST':
         obj = Post.objects.get(pk=pk, usuario=request.user)
@@ -62,21 +60,17 @@ def PostDelete(request, pk):
 
     return redirect(reverse_lazy('home'))
 
-# GETS POST DETAIL
-
+# post detail;
 @login_required(login_url='login')
 def PostDetail(request, pk):
 
-    # COMMENTING ON THE CURRENT POST
-
-    post = Post.objects.get(pk=pk)
+    # form for comment;
     comment_form = CommentForm()
 
-    # COMMENT'S LIST
-
-    post_comments = list(post.comments_set.all())
-
-    post_comments.sort(key=lambda x: x.data, reverse=True)
+    # returns all the comments from that post
+    from .models import Post
+    post = Post.objects.get(pk=pk)
+    post_comments = Post.return_post_comments(post)
 
     # WHO TO FOLLOW
 
@@ -88,10 +82,6 @@ def PostDetail(request, pk):
     following = len(my_profile.following.all())
     followers = len(my_profile.usuario.following.all())
 
-    # NOTIFICATIONS
-
-    count_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).count
-
     context = {
         'post': post,
         'perfil_list': perfil_list,
@@ -99,7 +89,6 @@ def PostDetail(request, pk):
         'post_comments': post_comments,
         'following': following,
         'followers': followers,
-        'count_notifications': count_notifications,
     }
 
     return render(request, 'posts/post-detail.html', context=context)

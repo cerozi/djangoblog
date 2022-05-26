@@ -14,14 +14,8 @@ from posts.forms import PostForm
 @login_required(login_url='login')
 def home(request):
 
-    # creates a post object based on the logged user;
+    # form instance;
     form = PostForm()
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            form.instance.usuario = request.user
-            form.save()
-            return redirect(reverse_lazy('home'))
 
     # followers and following queryset;
     following = len(request.user.perfil.following.all())

@@ -1,13 +1,9 @@
 from django.urls import path 
-from .views import renderizaPerfil, editarPerfil
+from .views import renderizaPerfil, editarPerfil, followuser
 
 urlpatterns = [
-    # USER PROFILE
-
     path('perfil/<str:username>/', renderizaPerfil, name='perfil'),
-
-    # UPDATES PROFILE
-
+    path('follows/<str:username>/', followuser, name='follow-user'),
     path('editar/', editarPerfil, name='editar-perfil'),
 
 ]
