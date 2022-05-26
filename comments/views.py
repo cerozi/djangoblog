@@ -3,9 +3,9 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 
 # other app imports;
-from notifications.models import Notifications
 from profileapp.models import Perfil
 from posts.models import Post
+from notifications.views import exclude_notification
 
 # current app imports;
 from .forms import CommentForm
@@ -20,6 +20,9 @@ def CommentDelete(request):
     # gets the comment primary key from the html;
     comment_pk = request.POST.get('comment_pk')
     comment_obj = get_object_or_404(Comments, usuario=request.user, pk=comment_pk)
+
+    exclude_notification(1, request.user, comment_obj.post.usuario, comment=comment_obj)
+
     comment_obj.delete()
 
     # updates the amount of comments associated to that current post;

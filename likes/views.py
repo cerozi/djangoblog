@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 # other apps imports
 from notifications.models import Notifications
 from notifications.signals import like_signal
+from notifications.views import exclude_notification
 from posts.models import Post
 from comments.models import Comments
 # current app imports
@@ -20,11 +21,7 @@ def PostLike(request):
         # checks if the user already liked the post;
         if request.user in post.curtidas.all(): # if so, delete the notification and takes the user from 'many to many' relation;
             post.curtidas.remove(request.user)
-            notification = Notifications.objects.filter(notification_type=0, 
-                                        from_user=request.user, 
-                                        to_user=post.usuario, post=post)
-            if notification.exists():
-                notification[0].delete()
+            exclude_notification(0, request.user, post.usuario, post=post)
         else: 
             post.curtidas.add(request.user) # adds user to the 'many to many' relation on the post object;
             like_signal.send(sender=None, instance=post, user=request.user) # sends a signal to create a notification;
@@ -47,10 +44,7 @@ def CommentLike(request):
         # checks if the user already liked the comment;
         if request.user in comment_obj.curtidas.all(): # if so, delete the notification and takes the user from 'many to many' relation;
             comment_obj.curtidas.remove(request.user)
-            notification = Notifications.objects.filter(notification_type=0, from_user=request.user, 
-                                                        to_user=comment_obj.usuario, comment=comment_obj)
-            if notification.exists():
-                notification[0].delete()
+            exclude_notification(1, request.user, comment_obj.usuario, comment=comment_obj)
         else:
             comment_obj.curtidas.add(request.user) # adds user to the 'many to many' relation on the post object;
             like_signal.send(sender=None, instance=comment_obj, user=request.user) # sends a signal to create a notification;

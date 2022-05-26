@@ -1,7 +1,10 @@
-from django.db import models
+# django built-in app imports
 from django.contrib.auth.models import User
-from posts.models import Post
+from django.db import models
 from django.db.models.signals import post_save
+# other app imports;
+from posts.models import Post
+
 
 class Comments(models.Model):
     texto = models.TextField()
@@ -15,7 +18,7 @@ class Comments(models.Model):
     def __str__(self):
         return self.texto
 
-
+# django signals receiver; increases the number of comments associated to that specific post; 
 def increse_post_num_comments(sender, instance, created, **kwargs):
     if created:
         post = instance.post

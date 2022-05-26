@@ -9,13 +9,21 @@ from .models import Notifications
 @login_required(login_url='login')
 def showNotifications(request):
     # queryset the notifications;
-    user_notifications = Notifications.objects.filter(to_user=request.user).exclude(user_has_seen=True).order_by('-data')
+    user_notifications = Notifications.objects.filter(to_user=request.user).order_by('-data')
     for notification in user_notifications:
-        notification.user_has_seen = True
-        notification.save()
+        notification.delete()
 
     context = {
         'user_notifications': user_notifications,
     }
 
     return render(request, 'notifications/notifications.html', context=context)
+
+
+# deletes notification that was created from a like, comment or follow that the user unmade;
+def exclude_notification(notif_type, from_user, to_user, post=None, comment=None):
+    notif = Notifications.objects.filter(notification_type=notif_type, 
+                                        from_user=from_user, to_user=to_user, 
+                                        post=post, comment=comment)
+    if notif.exists() and (not notif[0].user_has_seen):
+        notif[0].delete()

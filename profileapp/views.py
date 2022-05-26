@@ -6,6 +6,7 @@ from django.urls import reverse, reverse_lazy
 # other apps imports;
 from notifications.models import Notifications
 from notifications.signals import follow_signal
+from notifications.views import exclude_notification
 from posts.models import Post
 # current app imports;
 from .forms import PerfilUpdate, UserUpdate
@@ -78,9 +79,7 @@ def followuser(request, username):
 
     if user in logged_user.following.all(): # checks if the request user profile is associated to the user; 
         logged_user.following.remove(user) # if so, unfollows;
-        notification = Notifications.objects.filter(notification_type=2, from_user=request.user, to_user=user)
-        if notification.exists():
-            notification[0].delete()
+        exclude_notification(2, request.user, user)
     else:
         logged_user.following.add(user) # if dont, follows;
         follow_signal.send(None, from_user=logged_user.usuario, to_user=user) # creates a notification;
