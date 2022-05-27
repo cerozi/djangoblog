@@ -24,7 +24,8 @@ def PostLike(request):
             exclude_notification(0, request.user, post.usuario, post=post)
         else: 
             post.curtidas.add(request.user) # adds user to the 'many to many' relation on the post object;
-            like_signal.send(sender=None, instance=post, user=request.user) # sends a signal to create a notification;
+            if post.usuario != request.user:
+                like_signal.send(sender=None, instance=post, user=request.user) # sends a signal to create a notification;
             
 
         # updates the like object;
@@ -47,7 +48,8 @@ def CommentLike(request):
             exclude_notification(1, request.user, comment_obj.usuario, comment=comment_obj)
         else:
             comment_obj.curtidas.add(request.user) # adds user to the 'many to many' relation on the post object;
-            like_signal.send(sender=None, instance=comment_obj, user=request.user) # sends a signal to create a notification;
+            if comment_obj.usuario != request.user:
+                like_signal.send(sender=None, instance=comment_obj, user=request.user) # sends a signal to create a notification;
 
         # updates the like object;
         likes_obj = Likes.objects.get(comment=comment_obj)

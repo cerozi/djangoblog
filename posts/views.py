@@ -41,12 +41,8 @@ def PostUpdate(request, pk):
     from .models import Post
     post_comments = Post.return_post_comments(post_obj)
 
-    # profile queryset
-    perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
-
     context = {
         'post': post,
-        'perfil_list': perfil_list,
         'post_comments': post_comments,
     }
 
@@ -72,23 +68,10 @@ def PostDetail(request, pk):
     post = Post.objects.get(pk=pk)
     post_comments = Post.return_post_comments(post)
 
-    # WHO TO FOLLOW
-
-    perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
-
-    # FOLLOWERS AND FOLLOWING
-
-    my_profile = Perfil.objects.get(usuario=request.user)
-    following = len(my_profile.following.all())
-    followers = len(my_profile.usuario.following.all())
-
     context = {
         'post': post,
-        'perfil_list': perfil_list,
         'comment_form': comment_form,
         'post_comments': post_comments,
-        'following': following,
-        'followers': followers,
     }
 
     return render(request, 'posts/post-detail.html', context=context)

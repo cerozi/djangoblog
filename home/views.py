@@ -17,24 +17,13 @@ def home(request):
     # form instance;
     form = PostForm()
 
-    # followers and following queryset;
-    following = len(request.user.perfil.following.all())
-    followers = len(request.user.following.all())
-
     # returns a posts_list with all the posts from the users that the logged user is following;
     from profileapp.models import Perfil
     posts_list = Perfil.return_newsfeed_posts(request.user.perfil)
 
-    # returns a queryset with all the profiles; this list is used to be displayed...
-    # ...at the 'who to follow';
-    perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
-
     context = {
-        'seguidores': followers,
-        'seguindo': following,
         'form': form,
         'posts_list': posts_list,
-        'perfil_list': perfil_list,
     }
 
     return render(request, 'home/newsfeed.html', context=context)

@@ -17,34 +17,17 @@ from .models import Perfil
 @login_required(login_url='login')
 def renderizaPerfil(request, username):
 
-        # return a list with all the posts from the user;
-        from posts.models import Post
-        user_visitado = User.objects.get(username=username)
-        posts_list = Post.return_user_posts(None, user=user_visitado)
+    # return a list with all the posts from the user;
+    from posts.models import Post
+    user = User.objects.get(username=username)
+    posts_list = Post.return_user_posts(None, user=user)
 
-        # FOLLOWERS AND FOLOWING
+    context = {
+        'user': user,
+        'posts': posts_list,
+    }
 
-        perfil_visitado = Perfil.objects.get(usuario=user_visitado)
-        seguindo = perfil_visitado.following.all()
-        seguidores = user_visitado.following.all()
-        count_seguindo = len(seguindo)
-        count_seguidores = len(seguidores)
-
-        # =======================================================
-
-        # WHO TO FOLLOW
-
-        perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
-
-        context = {
-            'user': user_visitado,
-            'posts': posts_list,
-            'num_seguindo': count_seguindo,
-            'num_seguidores': count_seguidores,
-            'perfil_list': perfil_list,
-        }
-
-        return render(request, 'profileapp/perfil.html', context=context)
+    return render(request, 'profileapp/perfil.html', context=context)
 
 
 # updates profile;

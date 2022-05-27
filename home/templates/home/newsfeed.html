@@ -1,36 +1,13 @@
 {% extends 'base_templates/layout.html' %}
+{% load tags_for_user_card %}
+{% load tags_for_profiles_card %}
 {% load humanize %}
 
 {% block content %}
 
     <div id="main" class="container-fluid d-flex">
         <!-- Barra Izquierda -->
-        <div class="sidebar m-5 d-none d-md-block">
-            <div class="">
-                <div class="card " style="width: 18rem; text-align:center;border-radius: 20px;">
-                    <img class="card-img-top rounded-circle"
-                        style="width:60%; position: relative;left: 62px;padding-top: 20px;"
-                        src="{{ request.user.perfil.foto.url }}" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title font-weight-bold">{{ request.user.first_name }}</h5>
-                        <h6 class="card-title font-weight-bold">@{{ request.user.username }}</h6>
-                        
-
-                        <p class="card-text">{{ request.user.perfil.bio }}</p>
-                        <h6 class="card-title font-weight-bold">
-                        {{ seguidores }} Followers   
-                        {{ seguindo }} Following
-                        </h6>
-                        <a href="{% url 'perfil' request.user.username %}" class="btn  text-white rounded-pill">Meu perfil</a>
-                    </div>
-
-                </div>
-                <!-- LINK EDITAR PERFIL-->
-                <a href="{% url 'editar-perfil' %}" id="addATweetLeft" onclick="addTweet()" type="button"
-                style="border-radius: 30px; font-size: 1.1rem; font-weight:bold;"
-                class="btn btn-lg btn-block mt-4 text-white ">Editar meu perfil</a>
-            </div>
-        </div>
+        {% user_card request.user %}  
         <!-- End Barra Izquierda -->
 
         <!-- Center -->
@@ -161,21 +138,7 @@
         </div>
         <!-- End Center -->
 
-
         <!-- Barra Derecha -->
-        <div class="sidebar m-5 d-none d-xl-block">
-            <div class="card" style="width: 18rem;">
-                <div class="card-header">
-                    Sugestões de perfil
-                </div>
-                <ul class="list-group list-group-flush">
-                    {% for perfil in perfil_list %}
-                    <li class="list-group-item"><a href="{% url 'perfil' perfil.usuario.username %}" style="text-decoration: none;color: #657787;">{{ perfil.usuario.username }}</a></li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <br>
-            <a href="{% url 'search-user' %}">Procurar usúario...</a>
-        </div>
+        {% profiles_card %}
     </div>
 {% endblock content %}

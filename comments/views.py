@@ -22,7 +22,6 @@ def CommentDelete(request):
     comment_obj = get_object_or_404(Comments, usuario=request.user, pk=comment_pk)
 
     exclude_notification(1, request.user, comment_obj.post.usuario, comment=comment_obj)
-
     comment_obj.delete()
 
     # updates the amount of comments associated to that current post;
@@ -55,21 +54,11 @@ def CommentUpdate(request):
     from posts.models import Post
     post_comments = Post.return_post_comments(comment_obj.post)
 
-    # who to follow queryset;
-    perfil_list = Perfil.objects.exclude(usuario=request.user)[:3]
-
-    # followers and following amount;
-    following = len(request.user.perfil.following.all())
-    followers = len(request.user.following.all())
-
     # context
     context = {
         'post_obj': comment_obj.post,
         'post_comments': post_comments,
         'comment_form': comment_form,
-        'perfil_list': perfil_list,
-        'followers': followers,
-        'following': following,
         'comment_obj': comment_obj,
 
     }

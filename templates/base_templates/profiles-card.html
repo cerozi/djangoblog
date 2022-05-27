@@ -1,0 +1,14 @@
+<div class="sidebar m-5 d-none d-xl-block">
+    <div class="card" style="width: 18rem;">
+        <div class="card-header">
+            Sugestões de perfil
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for perfil in perfil_list %}
+            <li class="list-group-item"><a href="{% url 'perfil' perfil.usuario.username %}" style="text-decoration: none;color: #657787;">{{ perfil.usuario.username }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <br>
+    <a href="{% url 'search-user' %}">Procurar usúario...</a>
+</div>

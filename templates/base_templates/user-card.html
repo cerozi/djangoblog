@@ -1,0 +1,43 @@
+<div class="sidebar m-5 d-none d-md-block">
+    <div class="">
+        <div class="card " style="width: 18rem; text-align:center;border-radius: 20px;">
+            <img class="card-img-top rounded-circle"
+                style="width:60%; position: relative;left: 62px;padding-top: 20px;"
+                src="{{ pic_url }}" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title font-weight-bold">{{ first_name }}</h5>
+                <h6 class="card-title font-weight-bold">@{{ username }}</h6>
+                
+
+                <p class="card-text">{{ bio }}</p>
+                <h6 class="card-title font-weight-bold">
+                {{ followers }} Followers   
+                {{ following }} Following
+                </h6>
+                {% if user == request_user %}
+                    <a href="{% url 'perfil' username %}" class="btn  text-white rounded-pill">Meu perfil</a>
+                {% else %}
+                        <form method="POST" action="{% url 'follow-user' username %}" >
+                            {% csrf_token %}
+                            {% if user not in request_user.perfil.following.all %}
+                            <button type="submit" class="btn  text-white rounded-pill">
+                                Follow
+                            </button>
+                            {% else %}
+                            <button type="submit" class="btn  text-white rounded-pill">
+                                Unfollow
+                            </button>
+                            {% endif %}
+                        </form>
+                {% endif %}
+            </div>
+
+        </div>
+        <!-- LINK EDITAR PERFIL-->
+        {% if user == request_user %}
+        <a href="{% url 'editar-perfil' %}" id="addATweetLeft" onclick="addTweet()" type="button"
+        style="border-radius: 30px; font-size: 1.1rem; font-weight:bold;"
+        class="btn btn-lg btn-block mt-4 text-white ">Editar meu perfil</a>
+        {% endif %}
+    </div>
+</div>
