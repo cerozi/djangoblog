@@ -18,6 +18,9 @@ class Comments(models.Model):
     def __str__(self):
         return self.texto
 
+    class Meta:
+        verbose_name_plural = 'Comments'
+
 # django signals receiver; increases the number of comments associated to that specific post; 
 def increse_post_num_comments(sender, instance, created, **kwargs):
     if created:

@@ -10,6 +10,9 @@ class Likes(models.Model):
     comment = models.OneToOneField(Comments, on_delete=models.CASCADE, null=True)
     quantidade = models.IntegerField(default=0)
 
+    class Meta:
+        verbose_name_plural = 'Likes'
+
 # django signals for creating a model Like everytime...
 # ... a post object is created;
 def create_like_for_post(sender, instance, created, **kwargs):

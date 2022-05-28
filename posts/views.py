@@ -38,7 +38,6 @@ def PostUpdate(request, pk):
             return redirect(reverse_lazy('home'))
 
     # returns all the comments from that post
-    from .models import Post
     post_comments = Post.return_post_comments(post_obj)
 
     context = {
